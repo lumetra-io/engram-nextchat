@@ -4,7 +4,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "mcp-remote",
+        "mcp-remote@0.1.5",
         "https://mcp.lumetra.io/mcp/sse",
         "--header",
         "Authorization:Bearer eng_live_..."

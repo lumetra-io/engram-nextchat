@@ -67,7 +67,7 @@ cp mcp_config.example.json /path/to/NextChat/app/mcp/mcp_config.json
       "command": "npx",
       "args": [
         "-y",
-        "mcp-remote",
+        "mcp-remote@0.1.5",
         "https://mcp.lumetra.io/mcp/sse",
         "--header",
         "Authorization:Bearer eng_live_..."
@@ -77,7 +77,17 @@ cp mcp_config.example.json /path/to/NextChat/app/mcp/mcp_config.json
 }
 ```
 
+> **Why `mcp-remote@0.1.5`?** NextChat's official Docker image ships Node 18.20.8, and `mcp-remote@0.1.6+` pulls `undici@7` which requires Node 20+. Using the latest `mcp-remote` crashes the bridge at startup with `ReferenceError: File is not defined`. `0.1.5` is the last release that works on Node 18.
+
 For Docker, mount the file as shown in step 4. For Vercel/hosted, NextChat's UI also has an MCP server panel (Settings → MCP Market) that writes to the same file — you can paste the same JSON there if filesystem editing isn't available.
+
+### 6a. Claude 4.x users — pick the right model
+
+NextChat sends both `temperature` and `top_p` in every Anthropic request, which **Claude 4.x rejects** (`temperature and top_p cannot both be specified`). Workarounds, in order of least invasive:
+
+1. **Use Claude 3.x** (`claude-3-5-sonnet-latest`, `claude-3-5-haiku-latest`) — they accept both params without complaint. This is the simplest fix.
+2. **Use a non-Anthropic model** — OpenAI / Gemini / DeepSeek aren't picky about the param combo.
+3. **Patch NextChat** — strip `top_p` from the request payload before it hits Anthropic. Tracked upstream as a NextChat bug; we'll update this recipe once it's fixed.
 
 ### 6. Restart NextChat and verify
 
